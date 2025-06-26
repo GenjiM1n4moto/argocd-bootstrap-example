@@ -13,6 +13,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "hello-nginx.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "hello-nginx.name" . }}
-app.kubernetes.io/instance: {{ include "hello-nginx.fullname" }}
+app.kubernetes.io/instance: {{ include "hello-nginx.fullname" . }}
 {{- end }}
 

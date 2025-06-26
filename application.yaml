@@ -6,7 +6,7 @@ metadata:
 spec:
   project: demo
   source:
-    repoURL: https://github.com/your-org/argocd-helm-demo.git
+    repoURL: https://github.com/GenjiM1n4moto/argocd-bootstrap-example.git
     targetRevision: HEAD
     path: charts/hello-nginx
     helm:

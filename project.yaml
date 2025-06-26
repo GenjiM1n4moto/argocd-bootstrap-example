@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: demo
+  namespace: argocd
 spec:
   description: Helm demo project
   sourceRepos:

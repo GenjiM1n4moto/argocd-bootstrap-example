@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: demo
+  name: teama-prod
   namespace: argocd
 spec:
-  description: Helm demo project
+  description: Team A Production Environment
   sourceRepos:
     - '*'
   destinations:
-    - namespace: demo
+    - namespace: prod
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
-      kind: '*'
+      kind: '*' 

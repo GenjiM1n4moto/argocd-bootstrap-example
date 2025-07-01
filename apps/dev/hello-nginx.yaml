@@ -1,23 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hello-nginx
+  name: hello-nginx-dev
   namespace: argocd
 spec:
-  project: demo
+  project: teama-dev
   source:
     repoURL: https://github.com/GenjiM1n4moto/argocd-bootstrap-example.git
-    targetRevision: HEAD
+    targetRevision: develop
     path: charts/hello-nginx
     helm:
       valueFiles:
         - values.yaml
-      parameters:
-        - name: replicaCount
-          value: "2"
+        - environments/dev/values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo
+    namespace: develop
   syncPolicy:
     automated:
       prune: true

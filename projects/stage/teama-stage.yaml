@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: teama-stage
+  namespace: argocd
+spec:
+  description: Team A Staging Environment
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: stage
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*' 

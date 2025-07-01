@@ -1,0 +1,16 @@
+replicaCount: 3
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: hello.local
+      paths:
+        - path: /
+          pathType: Prefix
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m" 

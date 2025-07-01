@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: hello-nginx
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: develop
+            project: teama-dev
+            branch: develop
+            replicaCount: 1
+            memoryLimit: "128Mi"
+            cpuLimit: "100m"
+            host: hello-dev.local
+          - env: stage
+            namespace: stage
+            project: teama-stage
+            branch: staging
+            replicaCount: 2
+            memoryLimit: "256Mi"
+            cpuLimit: "200m"
+            host: hello-stage.local
+          - env: prod
+            namespace: prod
+            project: teama-prod
+            branch: HEAD
+            replicaCount: 3
+            memoryLimit: "512Mi"
+            cpuLimit: "500m"
+            host: hello.local
+  template:
+    metadata:
+      name: 'hello-nginx-{{env}}'
+      namespace: argocd
+    spec:
+      project: '{{project}}'
+      source:
+        repoURL: https://github.com/GenjiM1n4moto/argocd-bootstrap-example.git
+        targetRevision: '{{branch}}'
+        path: charts/hello-nginx
+        helm:
+          valueFiles:
+            - values.yaml
+            - environments/{{env}}/values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true 

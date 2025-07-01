@@ -1,23 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hello-nginx
+  name: hello-nginx-stage
   namespace: argocd
 spec:
-  project: prod
+  project: teama-stage
   source:
     repoURL: https://github.com/GenjiM1n4moto/argocd-bootstrap-example.git
-    targetRevision: HEAD
+    targetRevision: staging
     path: charts/hello-nginx
     helm:
       valueFiles:
         - values.yaml
-      parameters:
-        - name: replicaCount
-          value: "2"
+        - environments/stage/values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: prod
+    namespace: stage
   syncPolicy:
     automated:
       prune: true

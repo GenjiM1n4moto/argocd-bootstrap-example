@@ -1,0 +1,113 @@
+name: Branch Protection
+
+on:
+  push:
+    branches: [ main, master, prod, production ]
+  pull_request:
+    branches: [ main, master, prod, production ]
+
+jobs:
+  branch-protection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate YAML files
+        run: |
+          echo "🔍 Validating YAML files..."
+          find . -name "*.yaml" -o -name "*.yml" | while read file; do
+            echo "Checking $file"
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" || exit 1
+          done
+
+      - name: Check for direct pushes to protected branches
+        if: github.event_name == 'push'
+        run: |
+          echo "❌ Direct push to protected branch detected!"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Please use Pull Requests for changes to protected branches."
+          exit 1
+
+      - name: Validate commit messages
+        run: |
+          echo "📝 Validating commit messages..."
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # For direct pushes, check the commit message
+            git log --format=%B -n 1 ${{ github.sha }} | head -1 | grep -E "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+" || {
+              echo "❌ Invalid commit message format"
+              echo "Expected format: type(scope): description"
+              echo "Types: feat, fix, docs, style, refactor, test, chore"
+              exit 1
+            }
+          fi
+
+      - name: Check for sensitive files
+        run: |
+          echo "🔒 Checking for sensitive files..."
+          sensitive_files=(
+            ".env"
+            ".env.local"
+            "*.key"
+            "*.pem"
+            "secrets.yaml"
+            "config.yaml"
+          )
+          
+          for pattern in "${sensitive_files[@]}"; do
+            if find . -name "$pattern" -not -path "./.git/*" | grep -q .; then
+              echo "❌ Found potentially sensitive files:"
+              find . -name "$pattern" -not -path "./.git/*"
+              echo "Please remove or add to .gitignore"
+              exit 1
+            fi
+          done
+
+      - name: Validate ArgoCD configurations
+        run: |
+          echo "🔍 Validating ArgoCD configurations..."
+          
+          # Check Application files
+          if [ -d "apps" ]; then
+            for file in apps/*/*.yaml; do
+              if [ -f "$file" ]; then
+                echo "Validating $file"
+                python3 -c "
+import yaml
+with open('$file') as f:
+    data = yaml.safe_load(f)
+    if data.get('kind') == 'Application':
+        required_fields = ['metadata', 'spec']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f'Missing required field: {field}')
+        print('✅ $file is valid')
+"
+              fi
+            done
+          fi
+          
+          # Check Project files
+          if [ -d "projects" ]; then
+            for file in projects/*/*.yaml; do
+              if [ -f "$file" ]; then
+                echo "Validating $file"
+                python3 -c "
+import yaml
+with open('$file') as f:
+    data = yaml.safe_load(f)
+    if data.get('kind') == 'AppProject':
+        required_fields = ['metadata', 'spec']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f'Missing required field: {field}')
+        print('✅ $file is valid')
+"
+              fi
+            done
+          fi
+
+      - name: Success
+        run: |
+          echo "✅ All checks passed!"
+          echo "Branch protection rules are working correctly." 

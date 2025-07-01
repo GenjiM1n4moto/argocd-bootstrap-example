@@ -1,0 +1,62 @@
+[core]
+    editor = vim
+    autocrlf = input
+    safecrlf = warn
+
+[init]
+    defaultBranch = main
+
+[branch]
+    autoSetupMerge = always
+
+[pull]
+    rebase = true
+
+[push]
+    default = simple
+    followTags = true
+
+[merge]
+    ff = false
+
+[rebase]
+    autoStash = true
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    ca = commit -a
+    cm = commit -m
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    ll = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all
+    cleanup = "!git branch --merged | grep -v '\\*\\|main\\|develop' | xargs -n 1 git branch -d"
+    new-feature = "!f() { git checkout -b feature/$1; }; f"
+    new-hotfix = "!f() { git checkout -b hotfix/$1; }; f"
+    new-release = "!f() { git checkout -b release/$1; }; f"
+
+[color]
+    ui = auto
+    branch = auto
+    diff = auto
+    status = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan 
